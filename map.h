@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#include <string.h>
+
 enum case_sensitivity_t {
     CASE_SENSITIVE,
     CASE_INSENSITIVE

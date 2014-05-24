@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <minunit/minunit.h>
 #include "../map.h"
 #ifdef __APPLE__

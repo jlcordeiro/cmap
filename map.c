@@ -1,5 +1,5 @@
 //
-// map.h
+// map.c
 //
 
 #ifdef __APPLE__
@@ -9,7 +9,6 @@
 #include <malloc.h>
 #endif
 #include <stdio.h>
-#include <string.h>
 #include "map.h"
 
 static struct map_node_t* new_map_node(const char* key, void* value)
