@@ -1,0 +1,6 @@
+# DEPS
+test/deps
+
+# Build files
+*.o
+map_lib
