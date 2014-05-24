@@ -18,9 +18,11 @@ MU_TEST(null_check)
     struct map_t* test = new_map(CASE_SENSITIVE);
 
     mu_assert(map_get(test, name1) == NULL, "Should be NULL.");
+    mu_assert(map_size(test) == 0, "Wrong size");
 
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
+    mu_assert(map_size(test) == 1, "Wrong size");
 
     destroy_map(&test);
 }
@@ -31,9 +33,11 @@ MU_TEST(replace_check)
 
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
+    mu_assert(map_size(test) == 1, "Wrong size");
 
     map_set(test, name1, (void*)value2);
     mu_check(strcmp((const char*)map_get(test, name1), value2) == 0);
+    mu_assert(map_size(test) == 1, "Wrong size");
 
     destroy_map(&test);
 }
@@ -44,12 +48,15 @@ MU_TEST(multiple_check)
 
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
+    mu_assert(map_size(test) == 1, "Wrong size");
 
     map_set(test, name2, (void*)value2);
     mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     map_set(test, name3, (void*)value3);
     mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
+    mu_assert(map_size(test) == 3, "Wrong size");
 
     destroy_map(&test);
 }
@@ -63,6 +70,7 @@ MU_TEST(casesensitive_check)
 
     mu_check(strcmp((const char*)map_get(test, name1_lcase), value1) == 0);
     mu_check(strcmp((const char*)map_get(test, name1_ucase), value2) == 0);
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     destroy_map(&test);
 
@@ -73,6 +81,7 @@ MU_TEST(casesensitive_check)
 
     mu_check(strcmp((const char*)map_get(test, name1_lcase), value2) == 0);
     mu_check(strcmp((const char*)map_get(test, name1_ucase), value2) == 0);
+    mu_assert(map_size(test) == 1, "Wrong size");
 
     destroy_map(&test);
 }
@@ -84,11 +93,14 @@ MU_TEST(del_first_check) {
     map_set(test, name2, (void*)value2);
     map_set(test, name3, (void*)value3);
 
+    mu_assert(map_size(test) == 3, "Wrong size");
+
     map_del(test, name1);
 
     mu_check(map_get(test, name1) == NULL);
     mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
     mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     destroy_map(&test);
 }
@@ -100,11 +112,14 @@ MU_TEST(del_middle_check) {
     map_set(test, name2, (void*)value2);
     map_set(test, name3, (void*)value3);
 
+    mu_assert(map_size(test) == 3, "Wrong size");
+
     map_del(test, name2);
 
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
     mu_check(map_get(test, name2) == NULL);
     mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     destroy_map(&test);
 }
@@ -116,11 +131,14 @@ MU_TEST(del_last_check) {
     map_set(test, name2, (void*)value2);
     map_set(test, name3, (void*)value3);
 
+    mu_assert(map_size(test) == 3, "Wrong size");
+
     map_del(test, name3);
 
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
     mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
     mu_check(map_get(test, name3) == NULL);
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     destroy_map(&test);
 }

@@ -68,6 +68,7 @@ struct map_t* new_map(enum case_sensitivity_t cs)
     if (map) {
         map->head = NULL;
         map->case_s = cs;
+        map->size = 0;
     }
 
     return map;
@@ -102,6 +103,8 @@ void map_set(struct map_t* map, const char* key, void* value)
         node->next = new_map_node(key, value);
         node->next->prev = node;
     }
+
+    map->size++;
 }
 
 void map_del(struct map_t* map, const char* key)
@@ -120,6 +123,8 @@ void map_del(struct map_t* map, const char* key)
 
     free(matching_node->key);
     free(matching_node);
+
+    map->size--;
 }
 
 void destroy_map(struct map_t** map)
@@ -137,4 +142,9 @@ void destroy_map(struct map_t** map)
 
     free(*map);
     *map = NULL;
+}
+
+size_t map_size(struct map_t* map)
+{
+    return map->size;
 }

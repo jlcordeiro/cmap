@@ -23,6 +23,7 @@ struct map_node_t {
 struct map_t {
     struct map_node_t* head;
     enum case_sensitivity_t case_s;
+    size_t size;
 };
 
 struct map_t* new_map(enum case_sensitivity_t cs);
@@ -32,6 +33,7 @@ void* map_get(struct map_t* map, const char* key);
 void map_set(struct map_t* map, const char* key, void* value);
 void map_del(struct map_t* map, const char* key);
 
+size_t map_size(struct map_t* map);
 
 #ifdef __cplusplus
 }
