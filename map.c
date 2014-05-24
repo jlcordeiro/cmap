@@ -81,6 +81,7 @@ static struct map_node_t* map_find(struct map_t* map, const char* key)
     return node;
 }
 
+
 // Lib functions
 
 struct map_t* new_map(enum case_sensitivity_t cs)
@@ -98,6 +99,33 @@ struct map_t* new_map(enum case_sensitivity_t cs)
 
     return map;
 }
+
+void map_set_free_func(struct map_t* map, void (*f)(void*))
+{
+    map->free_func = f;
+}
+
+void destroy_map(struct map_t** map)
+{
+    struct map_node_t* node;
+    struct map_node_t* next_node;
+
+    for (node = (*map)->head; node != NULL; node = next_node) {
+        free(node->key);
+
+        if ((*map)->free_func && node->value) {
+            (*(*map)->free_func)(node->value);
+        }
+
+        next_node = node->next;
+        free(node);
+        node = NULL;
+    }
+
+    free(*map);
+    *map = NULL;
+}
+
 
 void* map_get(struct map_t* map, const char* key)
 {
@@ -170,33 +198,8 @@ void map_del(struct map_t* map, const char* key)
     map->size--;
 }
 
-void destroy_map(struct map_t** map)
-{
-    struct map_node_t* node;
-    struct map_node_t* next_node;
-
-    for (node = (*map)->head; node != NULL; node = next_node) {
-        free(node->key);
-
-        if ((*map)->free_func && node->value) {
-            (*(*map)->free_func)(node->value);
-        }
-
-        next_node = node->next;
-        free(node);
-        node = NULL;
-    }
-
-    free(*map);
-    *map = NULL;
-}
 
 size_t map_size(struct map_t* map)
 {
     return map->size;
-}
-
-void map_set_free_func(struct map_t* map, void (*f)(void*))
-{
-    map->free_func = f;
 }
