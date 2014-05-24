@@ -2,6 +2,12 @@
 #include <string.h>
 #include <minunit/minunit.h>
 #include "../map.h"
+#ifdef __APPLE__
+#include <stdlib.h>
+#include <strings.h>
+#else
+#include <malloc.h>
+#endif
 
 const char* name1 = "__one";
 const char* name2 = "__two";
@@ -157,9 +163,59 @@ MU_TEST_SUITE(del_suite) {
     MU_RUN_TEST(del_last_check);
 }
 
+MU_TEST(free_check) {
+    struct map_t* test = new_map(CASE_SENSITIVE);
+
+    struct person_t {
+        char* name;
+    };
+
+    struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
+    struct person_t* person2 = (struct person_t*)malloc(sizeof(struct person_t));
+    struct person_t* person3 = (struct person_t*)malloc(sizeof(struct person_t));
+
+    person1->name = (char*)malloc(strlen(value1)+1);
+    person2->name = (char*)malloc(strlen(value2)+1);
+    person3->name = (char*)malloc(strlen(value3)+1);
+
+    strcpy(person1->name, value1);
+    strcpy(person2->name, value2);
+    strcpy(person3->name, value3);
+
+    map_set(test, name1, (void*)person1);
+    map_set(test, name2, (void*)person2);
+    map_set(test, name3, (void*)person3);
+
+    mu_assert(map_size(test) == 3, "Wrong size");
+
+    void* v1 = map_get(test, name1);
+    void* v2 = map_get(test, name2);
+    void* v3 = map_get(test, name3);
+
+    map_del(test, name1);
+    map_del(test, name2);
+    map_del(test, name3);
+
+    free(person1);
+    free(person1->name);
+    free(person2);
+    free(person2->name);
+    free(person3);
+    free(person3->name);
+
+    mu_assert(map_size(test) == 0, "Wrong size");
+
+    destroy_map(&test);
+}
+
+MU_TEST_SUITE(memcheck_suite) {
+    MU_RUN_TEST(free_check);
+}
+
 int main()
 {
     MU_RUN_SUITE(main_suite);
     MU_RUN_SUITE(del_suite);
+    MU_RUN_SUITE(memcheck_suite);
     MU_REPORT();
 }
