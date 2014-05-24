@@ -15,11 +15,10 @@
 static struct map_node_t* new_map_node(const char* key, void* value)
 {
     struct map_node_t* new_node = NULL;
-    
+
     new_node = (struct map_node_t*)malloc(sizeof(struct map_node_t));
 
-    if (new_node)
-    {
+    if (new_node) {
         new_node->next = NULL;
         new_node->prev = NULL;
         new_node->value = value;
@@ -38,8 +37,7 @@ static struct map_node_t* new_map_node(const char* key, void* value)
 
 static int compare_key(const char* key1, const char* key2, enum case_sensitivity_t cs)
 {
-    switch (cs)
-    {
+    switch (cs) {
         case CASE_INSENSITIVE:
             return strcasecmp(key1, key2);
         case CASE_SENSITIVE:
@@ -64,11 +62,10 @@ static struct map_node_t* map_find(struct map_t* map, const char* key)
 struct map_t* new_map(enum case_sensitivity_t cs)
 {
     struct map_t* map = NULL;
-    
+
     map = (struct map_t*)malloc(sizeof(struct map_t));
 
-    if (map)
-    {
+    if (map) {
         map->head = NULL;
         map->case_s = cs;
     }
@@ -80,8 +77,7 @@ void* map_get(struct map_t* map, const char* key)
 {
     const struct map_node_t* node = map_find(map, key);
 
-    if (node)
-    {
+    if (node) {
         return node->value;
     }
 
@@ -92,18 +88,14 @@ void map_set(struct map_t* map, const char* key, void* value)
 {
     struct map_node_t* matching_node = map_find(map, key);
 
-    if (matching_node)
-    {
+    if (matching_node) {
         matching_node->value = value;
         return;
     }
 
-    if (map->head == NULL)
-    {
+    if (map->head == NULL) {
         map->head = new_map_node(key, value);
-    }
-    else
-    {
+    } else {
         struct map_node_t* node;
         for (node = map->head; node->next != NULL; node = node->next) {
         }
@@ -116,17 +108,13 @@ void map_del(struct map_t* map, const char* key)
 {
     struct map_node_t* matching_node = map_find(map, key);
 
-    if (!matching_node)
-    {
+    if (!matching_node) {
         return;
     }
 
-    if (matching_node == map->head)
-    {
+    if (matching_node == map->head) {
         map->head = map->head->next;
-    }
-    else
-    {
+    } else {
         matching_node->prev->next = matching_node->next;
     }
 
