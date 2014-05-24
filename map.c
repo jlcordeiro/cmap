@@ -13,6 +13,14 @@
 #include <stdio.h>
 #include "map.h"
 
+// Utility functions
+
+/**
+ * \brief Create a node.
+ * \param key Entry key.
+ * \param value Entry value.
+ * \return A new node object. In case of error, returns NULL.
+ */
 static struct map_node_t* new_map_node(const char* key, void* value)
 {
     struct map_node_t* new_node = NULL;
@@ -36,6 +44,13 @@ static struct map_node_t* new_map_node(const char* key, void* value)
     return new_node;
 }
 
+/**
+ * \brief Compare two keys, according to the chosen case sensitivity.
+ * \param key1 First key.
+ * \param key2 Second key.
+ * \param cs Case sensitivity.
+ * \return strcmp or strcasecmp result, depending on cs.
+ */
 static int compare_key(const char* key1, const char* key2, enum case_sensitivity_t cs)
 {
     switch (cs) {
@@ -48,6 +63,12 @@ static int compare_key(const char* key1, const char* key2, enum case_sensitivity
     }
 }
 
+/**
+ * \brief Find a node with a given key.
+ * \param map Map to search for the key in.
+ * \param key Key to search for.
+ * \return Pointer to node if found. NULL otherwise.
+ */
 static struct map_node_t* map_find(struct map_t* map, const char* key)
 {
     struct map_node_t* node;
@@ -59,6 +80,8 @@ static struct map_node_t* map_find(struct map_t* map, const char* key)
 
     return node;
 }
+
+// Lib functions
 
 struct map_t* new_map(enum case_sensitivity_t cs)
 {
@@ -87,7 +110,7 @@ void* map_get(struct map_t* map, const char* key)
     return NULL;
 }
 
-void map_set(struct map_t* map, const char* key, void* value)
+int map_set(struct map_t* map, const char* key, void* value)
 {
     struct map_node_t* matching_node = map_find(map, key);
 
@@ -97,20 +120,30 @@ void map_set(struct map_t* map, const char* key, void* value)
         }
 
         matching_node->value = value;
-        return;
+        return 0;
     }
 
     if (map->head == NULL) {
         map->head = new_map_node(key, value);
+
+        if (!map->head) {
+            return -1;
+        }
     } else {
         struct map_node_t* node;
         for (node = map->head; node->next != NULL; node = node->next) {
         }
         node->next = new_map_node(key, value);
+
+        if (!node->next) {
+            return -1;
+        }
+
         node->next->prev = node;
     }
 
     map->size++;
+    return 0;
 }
 
 void map_del(struct map_t* map, const char* key)
@@ -163,6 +196,7 @@ size_t map_size(struct map_t* map)
     return map->size;
 }
 
-void map_set_free_func(struct map_t* map, void (*f)(void*)) {
+void map_set_free_func(struct map_t* map, void (*f)(void*))
+{
     map->free_func = f;
 }
