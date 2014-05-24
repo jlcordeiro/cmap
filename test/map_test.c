@@ -17,7 +17,7 @@ MU_TEST(null_check)
 {
     struct map_t* test = new_map();
 
-    mu_assert(map_get_value(test, name1) == NULL, "Should be NULL.");
+    mu_assert(map_get(test, name1) == NULL, "Should be NULL.");
 
     map_set(test, name1, (void*)value1);
     map_set(test, name1, (void*)value1);
@@ -26,7 +26,7 @@ MU_TEST(null_check)
     map_set(test, name1, (void*)value1);
     map_set(test, name1, (void*)value1);
     map_set(test, name1, (void*)value1);
-    mu_check(strcmp((const char*)map_get_value(test, name1), value1) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
 
     destroy_map(&test);
 }
@@ -36,10 +36,10 @@ MU_TEST(replace_check)
     struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
-    mu_check(strcmp((const char*)map_get_value(test, name1), value1) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
 
     map_set(test, name1, (void*)value2);
-    mu_check(strcmp((const char*)map_get_value(test, name1), value2) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1), value2) == 0);
 
     destroy_map(&test);
 }
@@ -49,13 +49,13 @@ MU_TEST(multiple_check)
     struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
-    mu_check(strcmp((const char*)map_get_value(test, name1), value1) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
 
     map_set(test, name2, (void*)value2);
-    mu_check(strcmp((const char*)map_get_value(test, name2), value2) == 0);
+    mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
 
     map_set(test, name3, (void*)value3);
-    mu_check(strcmp((const char*)map_get_value(test, name3), value3) == 0);
+    mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
 
     destroy_map(&test);
 }
@@ -67,8 +67,8 @@ MU_TEST(casesensitive_check)
     map_set(test, name1_lcase, (void*)value1);
     map_set(test, name1_ucase, (void*)value2);
 
-    mu_check(strcmp((const char*)map_get_value(test, name1_lcase), value2) == 0);
-    mu_check(strcmp((const char*)map_get_value(test, name1_ucase), value2) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1_lcase), value2) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1_ucase), value2) == 0);
 
     destroy_map(&test);
 }
@@ -82,9 +82,9 @@ MU_TEST(del_first_check) {
 
     map_del(test, name1);
 
-    mu_check(map_get_value(test, name1) == NULL);
-    mu_check(strcmp((const char*)map_get_value(test, name2), value2) == 0);
-    mu_check(strcmp((const char*)map_get_value(test, name3), value3) == 0);
+    mu_check(map_get(test, name1) == NULL);
+    mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
+    mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
 
     destroy_map(&test);
 }
@@ -98,9 +98,9 @@ MU_TEST(del_middle_check) {
 
     map_del(test, name2);
 
-    mu_check(strcmp((const char*)map_get_value(test, name1), value1) == 0);
-    mu_check(map_get_value(test, name2) == NULL);
-    mu_check(strcmp((const char*)map_get_value(test, name3), value3) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
+    mu_check(map_get(test, name2) == NULL);
+    mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
 
     destroy_map(&test);
 }
@@ -114,9 +114,9 @@ MU_TEST(del_last_check) {
 
     map_del(test, name3);
 
-    mu_check(strcmp((const char*)map_get_value(test, name1), value1) == 0);
-    mu_check(strcmp((const char*)map_get_value(test, name2), value2) == 0);
-    mu_check(map_get_value(test, name3) == NULL);
+    mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
+    mu_check(strcmp((const char*)map_get(test, name2), value2) == 0);
+    mu_check(map_get(test, name3) == NULL);
 
     destroy_map(&test);
 }

@@ -62,7 +62,7 @@ struct map_t* new_map()
     return map;
 }
 
-void* map_get_value(struct map_t* map, const char* key)
+void* map_get(struct map_t* map, const char* key)
 {
     const struct map_node_t* node = map_find(map, key);
 
