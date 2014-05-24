@@ -30,10 +30,14 @@ struct map_t {
     struct map_node_t* head;
     enum case_sensitivity_t case_s;
     size_t size;
+
+    void (*free_func)(void*);
 };
 
 struct map_t* new_map(enum case_sensitivity_t cs);
 void destroy_map(struct map_t** map);
+
+void map_set_free_func(struct map_t* map, void (*f)(void*));
 
 void* map_get(struct map_t* map, const char* key);
 void map_set(struct map_t* map, const char* key, void* value);

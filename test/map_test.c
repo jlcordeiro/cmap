@@ -25,6 +25,24 @@ const char* value3 = "__3";
 const char* name1_lcase = "__one";
 const char* name1_ucase = "__One";
 
+struct person_t {
+    char* name;
+};
+
+void free_person(void* vperson) {
+    if (!vperson) {
+        return;
+    }
+
+    struct person_t* person = (struct person_t*)vperson;
+
+    if (person->name) {
+        free(person->name);
+    }
+
+    free(person);
+}
+
 MU_TEST(null_check)
 {
     struct map_t* test = new_map(CASE_SENSITIVE);
@@ -172,50 +190,56 @@ MU_TEST_SUITE(del_suite) {
 MU_TEST(free_check) {
     struct map_t* test = new_map(CASE_SENSITIVE);
 
-    struct person_t {
-        char* name;
-    };
-
     struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
     struct person_t* person2 = (struct person_t*)malloc(sizeof(struct person_t));
-    struct person_t* person3 = (struct person_t*)malloc(sizeof(struct person_t));
 
     person1->name = (char*)malloc(strlen(value1)+1);
     person2->name = (char*)malloc(strlen(value2)+1);
-    person3->name = (char*)malloc(strlen(value3)+1);
 
     strcpy(person1->name, value1);
     strcpy(person2->name, value2);
-    strcpy(person3->name, value3);
 
     map_set(test, name1, (void*)person1);
     map_set(test, name2, (void*)person2);
-    map_set(test, name3, (void*)person3);
 
-    mu_assert(map_size(test) == 3, "Wrong size");
+    mu_assert(map_size(test) == 2, "Wrong size");
 
     void* v1 = map_get(test, name1);
     void* v2 = map_get(test, name2);
-    void* v3 = map_get(test, name3);
 
     map_del(test, name1);
     map_del(test, name2);
-    map_del(test, name3);
 
-    free(person1);
-    free(person1->name);
-    free(person2);
-    free(person2->name);
-    free(person3);
-    free(person3->name);
+    free_person(person1);
+    free_person(person2);
 
     mu_assert(map_size(test) == 0, "Wrong size");
 
     destroy_map(&test);
 }
 
+MU_TEST(destroy_check) {
+    struct map_t* test = new_map(CASE_SENSITIVE);
+    map_set_free_func(test, free_person);
+
+    struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
+    struct person_t* person2 = (struct person_t*)malloc(sizeof(struct person_t));
+
+    person1->name = (char*)malloc(strlen(value1)+1);
+    person2->name = (char*)malloc(strlen(value2)+1);
+
+    strcpy(person1->name, value1);
+    strcpy(person2->name, value2);
+
+    map_set(test, name1, (void*)person1);
+    map_set(test, name2, (void*)person2);
+
+    destroy_map(&test);
+}
+
 MU_TEST_SUITE(memcheck_suite) {
     MU_RUN_TEST(free_check);
+    MU_RUN_TEST(destroy_check);
 }
 
 int main()
