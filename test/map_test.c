@@ -15,16 +15,10 @@ const char* name1_ucase = "__One";
 
 MU_TEST(null_check)
 {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     mu_assert(map_get(test, name1) == NULL, "Should be NULL.");
 
-    map_set(test, name1, (void*)value1);
-    map_set(test, name1, (void*)value1);
-    map_set(test, name1, (void*)value1);
-    map_set(test, name1, (void*)value1);
-    map_set(test, name1, (void*)value1);
-    map_set(test, name1, (void*)value1);
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
 
@@ -33,7 +27,7 @@ MU_TEST(null_check)
 
 MU_TEST(replace_check)
 {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
@@ -46,7 +40,7 @@ MU_TEST(replace_check)
 
 MU_TEST(multiple_check)
 {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     map_set(test, name1, (void*)value1);
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
@@ -62,7 +56,17 @@ MU_TEST(multiple_check)
 
 MU_TEST(casesensitive_check)
 {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
+
+    map_set(test, name1_lcase, (void*)value1);
+    map_set(test, name1_ucase, (void*)value2);
+
+    mu_check(strcmp((const char*)map_get(test, name1_lcase), value1) == 0);
+    mu_check(strcmp((const char*)map_get(test, name1_ucase), value2) == 0);
+
+    destroy_map(&test);
+
+    test = new_map(CASE_INSENSITIVE);
 
     map_set(test, name1_lcase, (void*)value1);
     map_set(test, name1_ucase, (void*)value2);
@@ -74,7 +78,7 @@ MU_TEST(casesensitive_check)
 }
 
 MU_TEST(del_first_check) {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);
@@ -90,7 +94,7 @@ MU_TEST(del_first_check) {
 }
 
 MU_TEST(del_middle_check) {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);
@@ -106,7 +110,7 @@ MU_TEST(del_middle_check) {
 }
 
 MU_TEST(del_last_check) {
-    struct map_t* test = new_map();
+    struct map_t* test = new_map(CASE_SENSITIVE);
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);

@@ -36,11 +36,24 @@ static struct map_node_t* new_map_node(const char* key, void* value)
     return new_node;
 }
 
+static int compare_key(const char* key1, const char* key2, enum case_sensitivity_t cs)
+{
+    switch (cs)
+    {
+        case CASE_INSENSITIVE:
+            return strcasecmp(key1, key2);
+        case CASE_SENSITIVE:
+            return strcmp(key1, key2);
+        default:
+            return strcmp(key1, key2);
+    }
+}
+
 static struct map_node_t* map_find(struct map_t* map, const char* key)
 {
     struct map_node_t* node;
     for (node = map->head; node != NULL; node = node->next) {
-        if (!strcasecmp(key, node->key)) {
+        if (!compare_key(key, node->key, map->case_s)) {
             return node;
         }
     }
@@ -48,7 +61,7 @@ static struct map_node_t* map_find(struct map_t* map, const char* key)
     return node;
 }
 
-struct map_t* new_map()
+struct map_t* new_map(enum case_sensitivity_t cs)
 {
     struct map_t* map = NULL;
     
@@ -57,6 +70,7 @@ struct map_t* new_map()
     if (map)
     {
         map->head = NULL;
+        map->case_s = cs;
     }
 
     return map;
