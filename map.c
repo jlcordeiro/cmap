@@ -1,6 +1,8 @@
 //
 // map.c
 //
+// Copyright (c) 2014 Joao Cordeiro
+// MIT licensed
 
 #ifdef __APPLE__
 #include <stdlib.h>

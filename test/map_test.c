@@ -1,3 +1,10 @@
+//
+// map_test.c
+//
+// Copyright (c) 2014 Joao Cordeiro
+// MIT licensed
+
+
 #include <stdio.h>
 #include <minunit/minunit.h>
 #include "../map.h"

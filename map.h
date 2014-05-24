@@ -1,4 +1,8 @@
+//
 // map.h
+//
+// Copyright (c) 2014 Joao Cordeiro
+// MIT licensed
 
 #ifndef __MAP_H__
 #define __MAP_H__
