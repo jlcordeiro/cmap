@@ -73,21 +73,16 @@ int main() {
 
 
 
-Running tests
+Running the tests
 =============
 
-Install dependencies
---------------------
+To install the dependencies you will need clib. During compilation all dependencies will be automatically installed if missing.
 
-To install the dependencies you will need clib and then run the command below:
-
-```
-make deps -C test
-```
-
-Compile and run
----------------
 ```
 make tests
 ./test/map_test
 ```
+
+Dependencies:
+
+* minunit
