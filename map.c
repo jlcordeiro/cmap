@@ -212,7 +212,7 @@ void map_del(struct map_t* map, const char* key)
 }
 
 
-size_t map_size(struct map_t* map)
+size_t map_size(const struct map_t* map)
 {
     return map->size;
 }

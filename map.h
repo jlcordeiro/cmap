@@ -102,7 +102,7 @@ void map_del(struct map_t* map, const char* key);
  * \param map Map to be analysed.
  * \return Number of elements in a map.
  */
-size_t map_size(struct map_t* map);
+size_t map_size(const struct map_t* map);
 
 #ifdef __cplusplus
 }
