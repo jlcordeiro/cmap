@@ -50,7 +50,7 @@ void _check_value(struct map_t* map, const char* key, const char* val) {
 
 MU_TEST(null_check)
 {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     mu_assert(map_get(test, name1) == NULL, "Should be NULL.");
     mu_assert(map_size(test) == 0, "Wrong size");
@@ -64,7 +64,7 @@ MU_TEST(null_check)
 
 MU_TEST(replace_check)
 {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
     _check_value(test, name1, value1);
@@ -79,7 +79,7 @@ MU_TEST(replace_check)
 
 MU_TEST(multiple_check)
 {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
     _check_value(test, name1, value1);
@@ -98,7 +98,7 @@ MU_TEST(multiple_check)
 
 MU_TEST(casesensitive_check)
 {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1_lcase, (void*)value1);
     map_set(test, name1_ucase, (void*)value2);
@@ -109,7 +109,8 @@ MU_TEST(casesensitive_check)
 
     destroy_map(&test);
 
-    test = new_map(CASE_INSENSITIVE);
+    test = new_map();
+    map_set_cmp_func(test, strcasecmp);
 
     map_set(test, name1_lcase, (void*)value1);
     map_set(test, name1_ucase, (void*)value2);
@@ -122,7 +123,7 @@ MU_TEST(casesensitive_check)
 }
 
 MU_TEST(del_first_check) {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);
@@ -141,7 +142,7 @@ MU_TEST(del_first_check) {
 }
 
 MU_TEST(del_middle_check) {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);
@@ -161,7 +162,7 @@ MU_TEST(del_middle_check) {
 }
 
 MU_TEST(del_last_check) {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     map_set(test, name1, (void*)value1);
     map_set(test, name2, (void*)value2);
@@ -194,7 +195,7 @@ MU_TEST_SUITE(del_suite) {
 }
 
 MU_TEST(free_check) {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
 
     struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
     struct person_t* person2 = (struct person_t*)malloc(sizeof(struct person_t));
@@ -225,7 +226,7 @@ MU_TEST(free_check) {
 }
 
 MU_TEST(destroy_check) {
-    struct map_t* test = new_map(CASE_SENSITIVE);
+    struct map_t* test = new_map();
     map_set_free_func(test, free_person);
 
     struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
@@ -249,7 +250,7 @@ MU_TEST_SUITE(memcheck_suite) {
 }
 
 MU_TEST(sort_add_check) {
-    struct map_t* map = new_map(CASE_SENSITIVE);
+    struct map_t* map = new_map();
 
     map_set(map, "whatever", (void*)value1);
     map_set(map, "bla", (void*)value2);
