@@ -1,74 +1,60 @@
 Small map implementation with char* keys and void* values.
 
+By default the map has its keys ordered alphabetically, but a different comparator function can be provided, resulting in any order that the developer may want.
+
+It is also possible to provide custom deallocation functions, so that all memory is properly cleared on deletion/destruction.
+
 Usage
 =====
 
 ```
-const char* name1 = "__one";
-const char* name2 = "__two";
-const char* value1 = "__1";
-const char* value2 = "__2";
-
-struct map_t* test = new_map(CASE_SENSITIVE);
-
-map_set(test, name1, (void*)value1);
-map_set(test, name2, (void*)value2);
-
-printf("%s => %s\n", name2, map_get(test, name2));
-
-map_del(test, name2);
-map_del(test, name1);
-
-destroy_map(&test);
-```
-
-This implementation allows the developer to provide custom deallocation functions, so that all memory is properly cleared on deletion/destruction.
-
-```
-struct person_t {
-    char* name;
+struct user_t {
+    const char* name;
+    int age;
 };
 
-void free_person(void* vperson) {
-    if (!vperson) {
-        return;
+const int NUSERS = 4;
+struct user_t users[NUSERS] = {{"john", 25},
+                               {"jane", 33},
+                               {"albert", 38},
+                               {"ross", 18}
+                              };
+
+// utility function
+static void print_users(const struct map_t* map)
+{
+    struct map_node_t* node;
+    
+    for (node = map->head; node; node = node->next) {
+        struct user_t* u = (struct user_t*)node->value;
+        printf("[%s] => {%s:%d}\n", node->key, u->name, u->age);
     }
-
-    struct person_t* person = (struct person_t*)vperson;
-
-    if (person->name) {
-        free(person->name);
-    }
-
-    free(person);
 }
 
 int main() {
-    const char* p1 = "p1";
-    const char* p2 = "p2";
-    const char* name1 = "john";
-    const char* name2 = "doe";
+    struct map_t* test_map = new_map();
 
-    struct map_t* person_map = new_map(CASE_SENSITIVE);
+    // build map with some test users
+    int i;
+    for (i = 0; i < NUSERS; i++) {
+        map_set(test_map, users[i].name, (void*)&users[i]);
+    }
 
-    map_set_free_func(person_map, free_person); // <-- tell the map how to deallocate each person
+    print_users(test_map);
 
-    struct person_t* person1 = (struct person_t*)malloc(sizeof(struct person_t));
-    struct person_t* person2 = (struct person_t*)malloc(sizeof(struct person_t));
+    // search and delete user
+    const char *name = "albert";
+    struct user_t* p = map_get(test_map, name);
+    if (p) {
+        printf("\nFound %s => {%s:%d}\n\n", name, p->name, p->age);
+        map_del(test_map, name);
+    }
 
-    person1->name = (char*)malloc(strlen(name1)+1);
-    person2->name = (char*)malloc(strlen(name2)+1);
+    print_users(test_map);
 
-    strcpy(person1->name, name1);
-    strcpy(person2->name, name2);
-
-    map_set(person_map, p1, (void*)person1);
-    map_set(person_map, p2, (void*)person2);
-
-    destroy_map(&person_map);
-
-    return 0;
+    destroy_map(&test_map);
 }
+
 ```
 
 
