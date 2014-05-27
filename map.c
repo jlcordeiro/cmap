@@ -29,7 +29,6 @@ static struct map_node_t* new_map_node(const char* key, void* value)
 
     if (new_node) {
         new_node->next = NULL;
-        new_node->prev = NULL;
         new_node->value = value;
 
         new_node->key = (char*)malloc(strlen(key) + 1);
@@ -63,22 +62,40 @@ static int compare_key(const char* key1, const char* key2, enum case_sensitivity
     }
 }
 
+struct map_find_results_t {
+    struct map_node_t* prev_node;
+    struct map_node_t* node;
+    unsigned short exact_match;
+};
+
 /**
  * \brief Find a node with a given key.
  * \param map Map to search for the key in.
  * \param key Key to search for.
  * \return Pointer to node if found. NULL otherwise.
  */
-static struct map_node_t* map_find(struct map_t* map, const char* key)
+static struct map_find_results_t map_find(struct map_t* map, const char* key)
 {
+    struct map_find_results_t results;
+
+    results.prev_node = NULL;
+    results.node = NULL;
+    results.exact_match = 0;
+
     struct map_node_t* node;
     for (node = map->head; node != NULL; node = node->next) {
-        if (!compare_key(key, node->key, map->case_s)) {
-            return node;
+        int cmp = compare_key(key, node->key, map->case_s);
+
+        if (cmp <= 0) {
+            results.node = node;
+            results.exact_match = (cmp == 0);
+            return results;
         }
+
+        results.prev_node = node;
     }
 
-    return node;
+    return results;
 }
 
 
@@ -129,10 +146,10 @@ void destroy_map(struct map_t** map)
 
 void* map_get(struct map_t* map, const char* key)
 {
-    const struct map_node_t* node = map_find(map, key);
+    const struct map_find_results_t find_result = map_find(map, key);
 
-    if (node) {
-        return node->value;
+    if (find_result.exact_match) {
+        return find_result.node->value;
     }
 
     return NULL;
@@ -140,34 +157,42 @@ void* map_get(struct map_t* map, const char* key)
 
 int map_set(struct map_t* map, const char* key, void* value)
 {
-    struct map_node_t* matching_node = map_find(map, key);
+    const struct map_find_results_t find_result = map_find(map, key);
 
-    if (matching_node) {
-        if (map->free_func && matching_node->value) {
-            (*map->free_func)(matching_node->value);
+    // found node with same key
+    if (find_result.exact_match) {
+        if (map->free_func && find_result.node->value) {
+            (*map->free_func)(find_result.node->value);
         }
 
-        matching_node->value = value;
+        find_result.node->value = value;
         return 0;
     }
 
+    // create the new node.
+    struct map_node_t* new_node = new_map_node(key, value);
+
+    if (!new_node) {
+        return -1;
+    }
+
+    // empty list
     if (map->head == NULL) {
-        map->head = new_map_node(key, value);
+        map->head = new_node;
+        map->size = 1;
+        return 0;
+    }
 
-        if (!map->head) {
-            return -1;
-        }
+    // put the new node in the proper place
+    struct map_node_t* node = find_result.node;
+    struct map_node_t* prev_node = find_result.prev_node;
+
+    new_node->next = node;
+
+    if (prev_node) {
+        prev_node->next = new_node;
     } else {
-        struct map_node_t* node;
-        for (node = map->head; node->next != NULL; node = node->next) {
-        }
-        node->next = new_map_node(key, value);
-
-        if (!node->next) {
-            return -1;
-        }
-
-        node->next->prev = node;
+        map->head = new_node;
     }
 
     map->size++;
@@ -176,24 +201,26 @@ int map_set(struct map_t* map, const char* key, void* value)
 
 void map_del(struct map_t* map, const char* key)
 {
-    struct map_node_t* matching_node = map_find(map, key);
+    struct map_find_results_t find_results = map_find(map, key);
 
-    if (!matching_node) {
+    if (!find_results.exact_match) {
         return;
     }
 
-    if (map->free_func && matching_node->value) {
-        (*map->free_func)(matching_node->value);
+    struct map_node_t* node = find_results.node;
+
+    if (map->free_func && node->value) {
+        (*map->free_func)(node->value);
     }
 
-    if (matching_node == map->head) {
+    if (node == map->head) {
         map->head = map->head->next;
     } else {
-        matching_node->prev->next = matching_node->next;
+        find_results.prev_node->next = node->next;
     }
 
-    free(matching_node->key);
-    free(matching_node);
+    free(node->key);
+    free(node);
 
     map->size--;
 }

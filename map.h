@@ -28,7 +28,6 @@ struct map_node_t {
     void* value;
 
     struct map_node_t* next;
-    struct map_node_t* prev;
 };
 
 /**

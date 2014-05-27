@@ -148,6 +148,7 @@ MU_TEST(del_middle_check) {
 
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
     mu_check(map_get(test, name2) == NULL);
+
     mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
     mu_assert(map_size(test) == 2, "Wrong size");
 
@@ -242,10 +243,41 @@ MU_TEST_SUITE(memcheck_suite) {
     MU_RUN_TEST(destroy_check);
 }
 
+MU_TEST(sort_add_check) {
+    struct map_t* map = new_map(CASE_SENSITIVE);
+
+    map_set(map, "whatever", (void*)value1);
+    map_set(map, "bla", (void*)value2);
+    map_set(map, "edag", (void*)value2);
+    map_set(map, "whatever2", (void*)value2);
+    map_set(map, "bleu", (void*)value2);
+    map_set(map, "std::", (void*)value2);
+
+    struct map_node_t* node = map->head;
+    mu_assert(strcmp(node->key, "bla") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "bleu") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "edag") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "std::") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "whatever") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "whatever2") == 0, node->key);
+
+    destroy_map(&map);
+}
+
+MU_TEST_SUITE(order_suite) {
+    MU_RUN_TEST(sort_add_check);
+}
+
 int main()
 {
     MU_RUN_SUITE(main_suite);
     MU_RUN_SUITE(del_suite);
     MU_RUN_SUITE(memcheck_suite);
+    MU_RUN_SUITE(order_suite);
     MU_REPORT();
 }
