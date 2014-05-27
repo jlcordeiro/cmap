@@ -249,10 +249,22 @@ MU_TEST(sort_add_check) {
     map_set(map, "whatever", (void*)value1);
     map_set(map, "bla", (void*)value2);
     map_set(map, "edag", (void*)value2);
+    map_set(map, "whatever2", (void*)value2);
+    map_set(map, "bleu", (void*)value2);
+    map_set(map, "std::", (void*)value2);
 
-    mu_assert(strcmp(map->head->key, "bla") == 0, map->head->key);
-    mu_assert(strcmp(map->head->next->key, "edag") == 0, map->head->next->key);
-    mu_assert(strcmp(map->head->next->next->key, "whatever") == 0, map->head->next->next->key);
+    struct map_node_t* node = map->head;
+    mu_assert(strcmp(node->key, "bla") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "bleu") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "edag") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "std::") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "whatever") == 0, node->key);
+    node = node->next;
+    mu_assert(strcmp(node->key, "whatever2") == 0, node->key);
 
     destroy_map(&map);
 }
