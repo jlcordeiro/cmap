@@ -140,34 +140,60 @@ void* map_get(struct map_t* map, const char* key)
 
 int map_set(struct map_t* map, const char* key, void* value)
 {
-    struct map_node_t* matching_node = map_find(map, key);
-
-    if (matching_node) {
-        if (map->free_func && matching_node->value) {
-            (*map->free_func)(matching_node->value);
-        }
-
-        matching_node->value = value;
-        return 0;
-    }
-
+    // empty list
     if (map->head == NULL) {
         map->head = new_map_node(key, value);
 
         if (!map->head) {
             return -1;
         }
+
+        map->size = 1;
+        return 0;
+    }
+
+    // create the new node.
+    struct map_node_t* new_node = new_map_node(key, value);
+
+    if (!new_node) {
+        return -1;
+    }
+
+    // put the new node in the proper place
+    struct map_node_t* node = NULL;
+    struct map_node_t* prev_node = node;
+    for (node = map->head; node; node = node->next) {
+        int cmp = compare_key(key, node->key, map->case_s);
+
+        // found node with same key
+        if (cmp == 0) {
+            if (map->free_func && node->value) {
+                (*map->free_func)(node->value);
+            }
+
+            node->value = value;
+            return 0;
+        }
+
+        // found node with a key with greater value
+        if (cmp < 0) {
+            break;
+        }
+
+        prev_node = node;
+    }
+
+    new_node->prev = prev_node;
+    new_node->next = node;
+
+    if (node) {
+        node->prev = new_node;
+    }
+
+    if (prev_node) {
+        prev_node->next = new_node;
     } else {
-        struct map_node_t* node;
-        for (node = map->head; node->next != NULL; node = node->next) {
-        }
-        node->next = new_map_node(key, value);
-
-        if (!node->next) {
-            return -1;
-        }
-
-        node->next->prev = node;
+        map->head = new_node;
     }
 
     map->size++;

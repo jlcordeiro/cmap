@@ -148,6 +148,7 @@ MU_TEST(del_middle_check) {
 
     mu_check(strcmp((const char*)map_get(test, name1), value1) == 0);
     mu_check(map_get(test, name2) == NULL);
+
     mu_check(strcmp((const char*)map_get(test, name3), value3) == 0);
     mu_assert(map_size(test) == 2, "Wrong size");
 
@@ -242,10 +243,29 @@ MU_TEST_SUITE(memcheck_suite) {
     MU_RUN_TEST(destroy_check);
 }
 
+MU_TEST(sort_add_check) {
+    struct map_t* map = new_map(CASE_SENSITIVE);
+
+    map_set(map, "whatever", (void*)value1);
+    map_set(map, "bla", (void*)value2);
+    map_set(map, "edag", (void*)value2);
+
+    mu_assert(strcmp(map->head->key, "bla") == 0, map->head->key);
+    mu_assert(strcmp(map->head->next->key, "edag") == 0, map->head->next->key);
+    mu_assert(strcmp(map->head->next->next->key, "whatever") == 0, map->head->next->next->key);
+
+    destroy_map(&map);
+}
+
+MU_TEST_SUITE(order_suite) {
+    MU_RUN_TEST(sort_add_check);
+}
+
 int main()
 {
     MU_RUN_SUITE(main_suite);
     MU_RUN_SUITE(del_suite);
     MU_RUN_SUITE(memcheck_suite);
+    MU_RUN_SUITE(order_suite);
     MU_REPORT();
 }
