@@ -15,11 +15,6 @@ extern "C" {
 
 //
 
-enum case_sensitivity_t {
-    CASE_SENSITIVE,
-    CASE_INSENSITIVE
-};
-
 /**
  * \brief Node structure.
  */
@@ -36,11 +31,12 @@ struct map_node_t {
 struct map_t {
     /** Head node */
     struct map_node_t* head;
-    /** Which case sensitivity for key comparison. */
-    enum case_sensitivity_t case_s;
 
     /** Number of elements in the map. */
     size_t size;
+
+    /** Function to use when comparing map keys. */
+    int (*cmp_func)(const char*, const char*);
 
     /** Function to use when deleting map values. */
     void (*free_func)(void*);
@@ -50,17 +46,26 @@ struct map_t {
 // Create and delete map functions
 
 /**
- * \brief Create a new map with the chosen case sensitivity.
+ * \brief Create a new map.
+ * Until something else is specifically set, this map will
+ * not do anything on entry deletion and will use strcmp to
+ * compare values.
  * \param cs Case sensitivity to use in key comparison.
  * \return New map or NULL on failure.
  */
-struct map_t* new_map(enum case_sensitivity_t cs);
+struct map_t* new_map();
 
 /**
  * \brief Save the pointer to the function to use to free map values.
  * \param f Pointer to the function that is to be called on value deletion.
  */
 void map_set_free_func(struct map_t* map, void (*f)(void*));
+
+/**
+ * \brief Save the pointer to the function to use compare map keys.
+ * \param f Pointer to the function that is to be called on key comparison.
+ */
+void map_set_cmp_func(struct map_t* map, int (*f)(const char*, const char*));
 
 /**
  * \brief Destroy map. Free all memory.

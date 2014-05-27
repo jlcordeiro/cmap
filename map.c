@@ -43,25 +43,6 @@ static struct map_node_t* new_map_node(const char* key, void* value)
     return new_node;
 }
 
-/**
- * \brief Compare two keys, according to the chosen case sensitivity.
- * \param key1 First key.
- * \param key2 Second key.
- * \param cs Case sensitivity.
- * \return strcmp or strcasecmp result, depending on cs.
- */
-static int compare_key(const char* key1, const char* key2, enum case_sensitivity_t cs)
-{
-    switch (cs) {
-        case CASE_INSENSITIVE:
-            return strcasecmp(key1, key2);
-        case CASE_SENSITIVE:
-            return strcmp(key1, key2);
-        default:
-            return strcmp(key1, key2);
-    }
-}
-
 struct map_find_results_t {
     struct map_node_t* prev_node;
     struct map_node_t* node;
@@ -84,7 +65,7 @@ static struct map_find_results_t map_find(struct map_t* map, const char* key)
 
     struct map_node_t* node;
     for (node = map->head; node != NULL; node = node->next) {
-        int cmp = compare_key(key, node->key, map->case_s);
+        int cmp = (*map->cmp_func)(key, node->key);
 
         if (cmp <= 0) {
             results.node = node;
@@ -101,7 +82,7 @@ static struct map_find_results_t map_find(struct map_t* map, const char* key)
 
 // Lib functions
 
-struct map_t* new_map(enum case_sensitivity_t cs)
+struct map_t* new_map()
 {
     struct map_t* map = NULL;
 
@@ -109,8 +90,8 @@ struct map_t* new_map(enum case_sensitivity_t cs)
 
     if (map) {
         map->head = NULL;
-        map->case_s = cs;
         map->size = 0;
+        map->cmp_func = strcmp;
         map->free_func = NULL;
     }
 
@@ -120,6 +101,11 @@ struct map_t* new_map(enum case_sensitivity_t cs)
 void map_set_free_func(struct map_t* map, void (*f)(void*))
 {
     map->free_func = f;
+}
+
+void map_set_cmp_func(struct map_t* map, int (*f)(const char*, const char*))
+{
+    map->cmp_func = f;
 }
 
 void destroy_map(struct map_t** map)
